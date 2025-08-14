@@ -75,9 +75,44 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    answer = manager_agent.run("Get the most viewed Singapore news today from Straits Times and Reddit. Format it into an array of json object with the its title and summary", max_steps=5)
-    print(f"my answer is {answer}")
-    return answer
+    try:
+        # Get JSON data from request body
+        data = request.get_json()
+        
+        # Validate that data exists and has the expected structure
+        if not data or 'sources' not in data:
+            return jsonify({
+                "error": "Invalid request. Expected JSON with 'sources' array."
+            }), 400
+        
+        sources = data['sources']
+        
+        # Validate that sources is a list
+        if not isinstance(sources, list):
+            return jsonify({
+                "error": "Sources must be an array of strings."
+            }), 400
+        
+        # Validate that all sources are strings
+        if not all(isinstance(source, str) for source in sources):
+            return jsonify({
+                "error": "All sources must be strings."
+            }), 400
+        
+        # Create dynamic query based on sources
+        sources_str = ", ".join(sources)
+        query = f"Get the most viewed Singapore news today from {sources_str}. Format it into an array of json object with its title, summary and source."
+
+        # Run the agent with the dynamic query
+        answer = manager_agent.run(query, max_steps=5)
+        print(f"my answer is {answer}")
+
+        return answer
+    
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 if __name__ == '__main__':
     # This runs the development server.
