@@ -1,2 +1,8 @@
+.env
+.venv
+venv
+.chroma
+tmp
+__pycache__
 .devcontainer/
 .env
