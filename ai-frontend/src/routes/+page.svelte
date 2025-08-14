@@ -7,18 +7,22 @@
 	import { slide } from 'svelte/transition';
 
 	let sources: { news: string; selected: boolean }[] = $state([
-		{ news: 'Reddit', selected: true },
-		{ news: 'The Straight Times', selected: false },
-		{ news: 'Mothership SG', selected: false },
-		{ news: 'The Straight Times', selected: false }
+		{ news: 'Reddit', selected: false },
+		{ news: 'The Strait Times', selected: false },
+		{ news: 'Mothership', selected: false },
+		{ news: 'Yahoo News', selected: false },
+		{ news: 'Channel News Asia', selected: false }
 	]);
 
 	let pageState: 'default' | 'retrieving' = $state('default');
 	let data: { title: string; summary: string }[] = $state([]);
 	async function fetchNews(): Promise<void> {
+        let rb = sources.filter(s => s.selected).map(s => s.news.toLowerCase());
 		pageState = 'retrieving';
 		try {
-			const response = await fetch('http://127.0.0.1:5000');
+			const response = await fetch('http://127.0.0.1:5000', {
+                body: JSON.stringify(rb)
+            });
 			if (response.status == 200) {
 				data = await response.json();
 			}
@@ -30,14 +34,15 @@
 </script>
 
 <main class="bg-background flex h-screen w-full justify-center">
-	<Card.Card
-		class="flex h-full w-4/5 min-w-[1280px] flex-col items-center justify-center border-none overflow-y-auto"
+
+	<div
+		class="flex h-full w-1/2 min-w-[640px] flex-col items-center justify-center gap-4 overflow-y-auto border-none"
 	>
 		<Card.Header class="w-full">
 			<Card.Title class="w-full text-center text-4xl">
 				{#if pageState === 'retrieving'}
-                    Retrieving news sources. Please be patient...
-                {:else}
+					Retrieving news sources. Please be patient...
+				{:else}
 					Please select your sources
 				{/if}</Card.Title
 			>
@@ -56,14 +61,14 @@
 		{#if pageState == 'retrieving'}
 			<Button disabled><Spinner class="animate-spin" /> Retrieving...</Button>
 		{:else}
-			<Button onclick={async () => await fetchNews()}>Generate</Button>
+			<Button disabled={sources.filter(s => s.selected).length === 0} onclick={async () => await fetchNews()}>Generate</Button>
 		{/if}
 
 		{#if data.length}
-			<div class="" transition:slide>
+			<div class="w-full px-8" transition:slide>
 				<Card.Title>Here are the news I've found</Card.Title>
 				{#each data as news}
-					<Card.Card>
+					<Card.Card class="w-full">
 						<Card.Header>
 							<Card.Title>{news.title}</Card.Title>
 							<Card.Description>{news.summary}</Card.Description>
@@ -72,5 +77,5 @@
 				{/each}
 			</div>
 		{/if}
-	</Card.Card>
+	</div>
 </main>
