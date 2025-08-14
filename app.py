@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import os
 from dotenv import load_dotenv
 import re
@@ -73,9 +73,10 @@ manager_agent = CodeAgent(
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     try:
+        print(f"Received {request.method} request at {request.path}")
         # Get JSON data from request body
         data = request.get_json()
         
