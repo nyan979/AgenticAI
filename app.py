@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 import re
@@ -72,6 +73,7 @@ manager_agent = CodeAgent(
 
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def home():
