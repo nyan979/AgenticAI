@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -151,16 +151,20 @@ def newsletter():
         # Create dynamic query based on sources
         sources_str = ", ".join(sources)
         emails_str = ", ".join(emails)
+        format = """{
+            "title": string,
+            "summary": string,
+            "source": string
+        }"""
         query = f"""
         Use the newsletter_agent to get the most viewed Singapore news today from {sources_str}. 
         Format it into an array of json objects with title, summary and source.
         Use the newsletter_agent to send formatted news as a newsletter email with the title 'Today's News' to these email addresses: {emails_str}.
-        Return the final output from formatted news.
+        Return the final output from formatted news. The format should be an array of {format}
         """
 
         # Run the agent with the dynamic query
         answer = manager_agent.run(query, max_steps=5)
-        print(f"my answer is {answer}")
 
         return answer
     
