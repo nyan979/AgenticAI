@@ -14,12 +14,21 @@ from smolagents import (
     OpenAIServerModel,
     tool
 )
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
 result = load_dotenv()
 print(result)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 print(OPENAI_API_KEY)
+
+# SMTP configuration
+smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+smtp_port = int(os.getenv('SMTP_PORT', '587'))
+sender_email = os.getenv('SENDER_EMAIL')
+sender_password = os.getenv('SENDER_PASSWORD')
 
 @tool
 def visit_webpage(url: str) -> str:
@@ -49,32 +58,68 @@ def visit_webpage(url: str) -> str:
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
+@tool
+def send_email(email_address: str, content: str) -> bool:
+    """
+    Send an email to a specified email address with given content.
+    
+    Args:
+        email_address (str): The recipient's email address
+        content (str): The email content/body
+        
+    Returns:
+        bool: True if the email was sent successfully, False otherwise
+    """
+    try:
+        
+        # Create message
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = email_address
+        message["Subject"] = "Today's News Letter"
+        
+        # Add content
+        message.attach(MIMEText(content, "plain"))
+        
+        # Send email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email_address, message.as_string())
+        
+        return True        
+    except Exception as e:
+        return False
+
 model_id = "gpt-4.1-mini"
 
 model = OpenAIServerModel(model_id=model_id, api_key=OPENAI_API_KEY)
 
-web_agent = ToolCallingAgent(
-    tools=[WebSearchTool(), visit_webpage],
+newsletter_agent = ToolCallingAgent(
+    tools=[WebSearchTool(), visit_webpage, send_email],
     model=model,
-    max_steps=10,
-    name="web_search_agent",
-    description="Runs web searches for you.",
+    max_steps=5,
+    name="newletter_agent",
+    description="An agent that helps to create a newsletter by searching for news, visiting webpages, and sending emails.",
 )
 
 manager_agent = CodeAgent(
     tools=[],
     model=model,
-    managed_agents=[web_agent],
+    managed_agents=[newsletter_agent],
     additional_authorized_imports=["time", "numpy", "pandas"],
 )
 
-
-
-
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def home():
+    return jsonify({
+        "message": "Welcome to the AI Newsletter Service! Please send a POST request with your sources and emails."
+    })
+
+@app.route('/newsletter', methods=['POST'])
+def newsletter():
     try:
         print(f"Received {request.method} request at {request.path}")
         # Get JSON data from request body
@@ -87,6 +132,7 @@ def home():
             }), 400
         
         sources = data['sources']
+        emails = data['emails']
         
         # Validate that sources is a list
         if not isinstance(sources, list):
@@ -102,7 +148,13 @@ def home():
         
         # Create dynamic query based on sources
         sources_str = ", ".join(sources)
-        query = f"Get the most viewed Singapore news today from {sources_str}. Format it into an array of json object with its title, summary and source."
+        emails_str = ", ".join(emails)
+        query = f"""
+        Use the newsletter_agent to get the most viewed Singapore news today from {sources_str}. 
+        Format it into an array of json objects with title, summary and source.
+        Use the newsletter_agent to send formatted news as a newsletter email with the title 'Today's News' to these email addresses: {emails_str}.
+        Return the final output from formatted news.
+        """
 
         # Run the agent with the dynamic query
         answer = manager_agent.run(query, max_steps=5)
