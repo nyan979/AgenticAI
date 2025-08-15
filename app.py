@@ -168,6 +168,7 @@ def newsletter():
         # Run the agent with the dynamic query
         answer = manager_agent.run(query, max_steps=5)
 
+
         return answer
     
     except Exception as e:

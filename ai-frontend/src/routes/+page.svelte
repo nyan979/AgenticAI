@@ -17,7 +17,15 @@
 	let pageState: 'default' | 'retrieving' = $state('default');
 
 	let isStopping: boolean = $state(false);
-	let data: { title: string; summary: string; url: string }[] = $state([]);
+	let data: { title: string; summary: string; url: string }[] = $state([
+		// {
+		// 	title:
+		// 		'I still feel guilty’: Man who tried to save pair in fatal Bukit Merah blaze wishes he could have done more - CNA',
+		// 	summary:
+		// 		'An emotional account from a man involved in a fatal fire at Bukit Merah who attempted to rescue victims and continues to struggle with feelings of guilt despite his heroic efforts.',
+		// 	url: 'https://www.channelnewsasia.com/singapore/fire-bukit-merah-two-dead-hero-guilty-rescue-attempt-scdf-5294136'
+		// }
+	]);
 	async function fetchNews(): Promise<void> {
 		let source_rb = sources.filter((s) => s.selected).map((s) => s.news.toLowerCase());
 		pageState = 'retrieving';
@@ -122,8 +130,11 @@
 									<Card.Title>{news.title}</Card.Title>
 									<Card.Description>{news.summary}</Card.Description>
 								</Card.Header>
-								<Card.Content class="text-muted-foreground text-xs flex gap-2 items-center"
-									>Source: <Button variant='link' class="w-full truncate px-0"  href={news.url}>{news.url}</Button></Card.Content
+								<Card.Content class="text-muted-foreground text-xs w-full flex items-center px-6 gap-1">
+									<span>Source:</span>
+									<Button variant="link" class="w-0 flex justify-start grow truncate px-0 text-start" href={news.url}
+										>{news.url}</Button
+									></Card.Content
 								>
 							</Card.Card>
 						</div>
