@@ -9,9 +9,7 @@ from requests.exceptions import RequestException
 from smolagents import (
     CodeAgent,
     ToolCallingAgent,
-    InferenceClientModel,
     WebSearchTool,
-    LiteLLMModel,
     OpenAIServerModel,
     tool
 )
@@ -21,9 +19,7 @@ from email.mime.multipart import MIMEMultipart
 
 # Load environment variables from .env file
 result = load_dotenv()
-print(result)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-print(OPENAI_API_KEY)
 
 # SMTP configuration
 smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
