@@ -1,10 +1,13 @@
 # Group Project: Agentic AI
 
-Idea: News of the day
-- *Agentic portion: Autonomously does the following:
-- (AI Tool) Get latest headlines
-- (LLM) Prioritises the most important
-- (LLM) Summarises and displays above
+Idea: Top News of the day
+- Description: Agentic AI that gathers the top headlines from online specified news sources, prioritieses the most popular (by views), summarises them. Additionally, sends the summary to a specified email. 
 
-- (Optional) Finds other relevant topics / opinions and display
-- (Optional) Allow narrowing down of articles searched (i.e. Singapore / AI)
+Software Components:
+- Tools:
+    - Visit Webpage (To get news) 
+    - Send Email (To send summary)
+- Agent:
+    - Newsletter Agent (Uses above tools to get, sumamrise, then send the news)
+- Manager:
+    - Manager Agent: Manages the above agent
