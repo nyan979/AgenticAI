@@ -16,6 +16,20 @@ Software Components:
 
 # Quickstart
 
+## Frontend Application
+
+
+1. Navigate into the frontend folder and install node modules
+``` bash
+cd ai-frontend
+npm install
+```
+
+2. Start up development server
+``` bash
+ npm run dev
+```
+
 ## Python Backend Application
 
 1. Prepare the env file from `.env.template`
