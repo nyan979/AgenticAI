@@ -160,13 +160,13 @@ def newsletter():
         }"""
         query = f"""
         Use the newsletter_agent to get the most viewed Singapore news today from {sources_str}. 
-        Format it into an array of json objects with title, summary and source.
+        Format it into an array of json objects with title, summary and url.
         Use the newsletter_agent to send formatted news as a newsletter email with the title 'Today's News' to these email addresses: {emails_str}.
         Return the final output from formatted news. The format should be an array of {format}
         """
 
         # Run the agent with the dynamic query
-        answer = manager_agent.run(query, max_steps=5)
+        answer = manager_agent.run(query, max_steps=10)
 
 
         return answer

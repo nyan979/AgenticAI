@@ -10,10 +10,10 @@
 	let { email = $bindable() }: { email: string } = $props();
 
 	let sources: { news: string; selected: boolean; img?: string }[] = $state([
-		{ news: 'Reddit', selected: false, img: 'reddit.png' },
 		{ news: 'The Strait Times', selected: false, img: 'strait-times.png' },
+		{ news: 'Channel News Asia', selected: false, img: 'cna.jpeg' },
 		{ news: 'Mothership', selected: false, img: 'mothership.png' },
-		{ news: 'Channel News Asia', selected: false, img: 'cna.jpeg' }
+		{ news: 'Reddit', selected: false, img: 'reddit.png' },
 	]);
 
 	const DELAY_OFFSET: number = 0.5;
@@ -33,7 +33,7 @@
 		let source_rb = sources.filter((s) => s.selected).map((s) => s.news.toLowerCase());
 		pageState = 'retrieving';
 		let emails: string[] = [];
-		if (email.trim().length) {
+		if (email?.trim().length) {
 			emails.push(email);
 		}
 		
