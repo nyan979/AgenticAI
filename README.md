@@ -30,6 +30,9 @@ npm install
  npm run dev
 ```
 
+3. Navigate to landing page
+go to "http://localhost:5173"
+
 ## Python Backend Application
 
 1. Prepare the env file from `.env.template`

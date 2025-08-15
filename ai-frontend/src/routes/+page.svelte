@@ -10,16 +10,14 @@
 		{ news: 'Reddit', selected: false, img: 'reddit.png' },
 		{ news: 'The Strait Times', selected: false, img: 'strait-times.png' },
 		{ news: 'Mothership', selected: false, img: 'mothership.png' },
-		{ news: 'Yahoo News', selected: false, img: 'yahoo.png' },
 		{ news: 'Channel News Asia', selected: false, img: 'cna.jpeg' }
 	]);
 
 	const DELAY_OFFSET: number = 0.5;
 	let pageState: 'default' | 'retrieving' = $state('default');
 
-	let emails: string[] = $state([]);
 	let isStopping: boolean = $state(false);
-	let data: { title: string; summary: string; source: string }[] = $state([]);
+	let data: { title: string; summary: string; url: string }[] = $state([]);
 	async function fetchNews(): Promise<void> {
 		let source_rb = sources.filter((s) => s.selected).map((s) => s.news.toLowerCase());
 		pageState = 'retrieving';
@@ -39,14 +37,18 @@
 					data = await response.json();
 					console.log(data);
 				}
-				pageState = 'default';
-				isStopping = false;
+				initialize();
 			}
 		} catch (e) {
 			console.error(e);
-			pageState = 'default';
-			isStopping = false;
+			initialize();
 		}
+	}
+
+	function initialize() {
+		pageState = 'default';
+		isStopping = false;
+		sources = sources.map((s) => ({ img: s.img, selected: false, news: s.news }));
 	}
 </script>
 
@@ -95,8 +97,8 @@
 						onclick={() => {
 							isStopping = true;
 							data = [];
-							sources = sources.map(s => ({img: s.img, selected: false, news: s.news}))
-							pageState = "default"
+							sources = sources.map((s) => ({ img: s.img, selected: false, news: s.news }));
+							pageState = 'default';
 						}}><Square /></Button
 					>
 				{:else}
@@ -109,7 +111,7 @@
 			</Card.Footer>
 		{:else}
 			<div class="flex h-3/4 w-full flex-col justify-center px-8" in:slide>
-				<Card.Title class="sticky top-0 text-3xl mb-4"
+				<Card.Title class="sticky top-0 mb-4 text-3xl"
 					>Here are the top headlines for Singapore.</Card.Title
 				>
 				<div class="flex max-h-full flex-col gap-4 overflow-y-auto py-4">
@@ -120,8 +122,8 @@
 									<Card.Title>{news.title}</Card.Title>
 									<Card.Description>{news.summary}</Card.Description>
 								</Card.Header>
-								<Card.Content class="text-muted-foreground text-xs"
-									>Source: {news.source}</Card.Content
+								<Card.Content class="text-muted-foreground text-xs flex gap-2 items-center"
+									>Source: <Button variant='link' class="w-full truncate px-0"  href={news.url}>{news.url}</Button></Card.Content
 								>
 							</Card.Card>
 						</div>
@@ -132,7 +134,7 @@
 					class="mt-4"
 					onclick={() => {
 						data = [];
-						
+						initialize();
 					}}>Clear</Button
 				>
 			</div>

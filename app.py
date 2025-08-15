@@ -156,7 +156,7 @@ def newsletter():
         format = """{
             "title": string,
             "summary": string,
-            "source": string
+            "url": string
         }"""
         query = f"""
         Use the newsletter_agent to get the most viewed Singapore news today from {sources_str}. 
