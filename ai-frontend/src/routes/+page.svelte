@@ -5,6 +5,9 @@
 	import Square from '@lucide/svelte/icons/square';
 	import Spinner from '@lucide/svelte/icons/loader-circle';
 	import { fade, slide } from 'svelte/transition';
+	import Input from '$lib/components/ui/input/input.svelte';
+
+	let { email = $bindable() }: { email: string } = $props();
 
 	let sources: { news: string; selected: boolean; img?: string }[] = $state([
 		{ news: 'Reddit', selected: false, img: 'reddit.png' },
@@ -29,6 +32,11 @@
 	async function fetchNews(): Promise<void> {
 		let source_rb = sources.filter((s) => s.selected).map((s) => s.news.toLowerCase());
 		pageState = 'retrieving';
+		let emails: string[] = [];
+		if (email.trim().length) {
+			emails.push(email);
+		}
+		
 		try {
 			const response = await fetch('http://127.0.0.1:5000/newsletter', {
 				method: 'POST',
@@ -37,13 +45,12 @@
 				},
 				body: JSON.stringify({
 					sources: source_rb,
-					emails: ['jarylozh@gmail.com']
+					emails
 				})
 			});
 			if (response.status == 200) {
 				if (!isStopping) {
 					data = await response.json();
-					console.log(data);
 				}
 				initialize();
 			}
@@ -77,7 +84,7 @@
 					{/if}</Card.Title
 				>
 			</Card.Header>
-			<Card.Content class="">
+			<Card.Content class="flex flex-col justify-center items-center">
 				{#if pageState == 'default'}
 					<div class="flex w-1/2 min-w-[620px] flex-wrap justify-center gap-4">
 						{#each sources as source, i}
@@ -93,6 +100,7 @@
 							>
 						{/each}
 					</div>
+					<Input bind:value={email} placeholder="Email (optional)" class="mt-4 w-[22rem]" />
 				{/if}
 			</Card.Content>
 
@@ -111,7 +119,7 @@
 					>
 				{:else}
 					<Button
-						class="text-sm"
+						class="mt-4 w-[18rem] text-sm"
 						disabled={sources.filter((s) => s.selected).length === 0}
 						onclick={async () => await fetchNews()}>Generate</Button
 					>
@@ -130,10 +138,14 @@
 									<Card.Title>{news.title}</Card.Title>
 									<Card.Description>{news.summary}</Card.Description>
 								</Card.Header>
-								<Card.Content class="text-muted-foreground text-xs w-full flex items-center px-6 gap-1">
+								<Card.Content
+									class="text-muted-foreground flex w-full items-center gap-1 px-6 text-xs"
+								>
 									<span>Source:</span>
-									<Button variant="link" class="w-0 flex justify-start grow truncate px-0 text-start" href={news.url}
-										>{news.url}</Button
+									<Button
+										variant="link"
+										class="flex w-0 grow justify-start truncate px-0 text-start"
+										href={news.url}>{news.url}</Button
 									></Card.Content
 								>
 							</Card.Card>
