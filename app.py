@@ -1,3 +1,4 @@
+# Import necessary libraries
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
@@ -9,9 +10,7 @@ from requests.exceptions import RequestException
 from smolagents import (
     CodeAgent,
     ToolCallingAgent,
-    InferenceClientModel,
     WebSearchTool,
-    LiteLLMModel,
     OpenAIServerModel,
     tool
 )
@@ -19,11 +18,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
+# Load environment variables from .env file
 result = load_dotenv()
-print(result)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-print(OPENAI_API_KEY)
 
 # SMTP configuration
 smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
@@ -31,6 +28,7 @@ smtp_port = int(os.getenv('SMTP_PORT', '587'))
 sender_email = os.getenv('SENDER_EMAIL')
 sender_password = os.getenv('SENDER_PASSWORD')
 
+# Create a tool to visit a webpage
 @tool
 def visit_webpage(url: str) -> str:
     """Visits a webpage at the given URL and returns its content as a markdown string.
@@ -59,6 +57,7 @@ def visit_webpage(url: str) -> str:
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
+# Create a tool to send an email
 @tool
 def send_email(email_address: str, content: str) -> bool:
     """
@@ -92,10 +91,11 @@ def send_email(email_address: str, content: str) -> bool:
     except Exception as e:
         return False
 
+# Initialize the OpenAI model
 model_id = "gpt-4.1-mini"
-
 model = OpenAIServerModel(model_id=model_id, api_key=OPENAI_API_KEY)
 
+# Create the newsletter agent
 newsletter_agent = ToolCallingAgent(
     tools=[WebSearchTool(), visit_webpage, send_email],
     model=model,
@@ -104,6 +104,7 @@ newsletter_agent = ToolCallingAgent(
     description="An agent that helps to create a newsletter by searching for news, visiting webpages, and sending emails.",
 )
 
+# Create the manager agent that manages agent
 manager_agent = CodeAgent(
     tools=[],
     model=model,
@@ -111,6 +112,7 @@ manager_agent = CodeAgent(
     additional_authorized_imports=["time", "numpy", "pandas"],
 )
 
+# Initialize Flask for REST APIs
 app = Flask(__name__)
 CORS(app)
 
