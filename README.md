@@ -18,20 +18,21 @@ Software Components:
 
 ## Frontend Application
 
-
 1. Navigate into the frontend folder and install node modules
-``` bash
+
+```bash
 cd ai-frontend
 npm install
 ```
 
 2. Start up development server
-``` bash
+
+```bash
  npm run dev
 ```
 
 3. Navigate to landing page
-go to "http://localhost:5173"
+   go to "http://localhost:5173"
 
 ## Python Backend Application
 
@@ -42,9 +43,16 @@ go to "http://localhost:5173"
 pip install -r requirements.txt
 ```
 
-3. Run the application
+3. Start up virtual environment
 
 ```bash
+source .venv/bin/activate
+```
+
+4. Run the application
+
+```bash
+
 python app.py
 ```
 
